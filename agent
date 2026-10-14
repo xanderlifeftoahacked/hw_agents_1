@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$ROOT/.env" ]; then
+    while IFS='=' read -r key value; do
+        if [[ -n "$key" && "$key" != \#* && -z "${!key+x}" ]]; then
+            export "$key=$value"
+        fi
+    done < "$ROOT/.env"
+fi
+export AGENT_POLICY="${AGENT_POLICY:-$ROOT/policy.toml}"
+exec env PYTHONPATH="$ROOT" PYTHONUNBUFFERED=1 "$ROOT/.venv/bin/python" -m codeagent "$@"
